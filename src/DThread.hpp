@@ -11,7 +11,7 @@ class DThread : public IThread {
 
 public:
   template <typename Action>
-  DThread(const ID id, Action a) : IThread(id, std::forward<Action>(a)) {
+  DThread(const ID id, Action && a) : IThread(id, std::forward<Action>(a)) {
     t.detach();
   }
   virtual ~DThread() = default;

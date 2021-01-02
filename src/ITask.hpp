@@ -1,18 +1,18 @@
 #ifndef ITASK_HPP
 #define ITASK_HPP
 
+#include <any>
 #include <memory>
 #include <utility>
-#include <any>
-#include "IResult.hpp"
+// #include <iostream>
 
 namespace ssg {
 
-class ITask {
+template <typename ResultType> class ITask {
 public:
   class TaskConcept {
   public:
-    virtual std::unique_ptr<IResult> run() = 0;
+    virtual ResultType run() = 0;
     virtual ~TaskConcept() = default;
   };
 
@@ -20,23 +20,27 @@ public:
     T object;
 
   public:
-    TaskModel(T &&t) : object(std::forward<T>(t)){};
+    TaskModel(T &&t) : object(std::forward<T>(t)) {};
     virtual ~TaskModel() = default;
-    virtual std::unique_ptr<IResult> run() override { return object.run(); }
+    virtual ResultType run() override { return object.run(); }
   };
 
   template <typename U>
   ITask(U u) : conc(new TaskModel<U>(std::forward<U>(u))) {}
 
-  ITask(const ITask &other) { conc = other.conc; }
+  // ITask(const ITask &other) {
+  //   std::cout << "const ITask & \n";
+  //   conc = other.conc;
+  // }
 
-  ITask(ITask &&other) {
-    conc = std::move(other.conc);
-    other.conc = nullptr;
-  }
+  // ITask(ITask &&other) {
+  //   std::cout << "ITask && \n";
+  //   conc = std::move(other.conc);
+  //   other.conc = nullptr;
+  // }
 
-  std::unique_ptr<IResult> run() {
-      return conc->run();
+  ResultType run() {
+    return conc->run();
   }
 
 private:

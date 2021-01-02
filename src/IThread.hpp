@@ -10,8 +10,8 @@ namespace ssg {
 class IThread : public ISubject {
 public:
   template <typename Action>
-  IThread(const ID id, Action action)
-      : ISubject(id), t([this, &action, id] {
+  IThread(const ID id, Action &&action)
+      : ISubject(id), t([this, action, id]() mutable {
           result = std::make_shared<Message>(id, action());
           notifyAll();
         }) {}

@@ -2,6 +2,7 @@
 #define JTHREAD_HPP
 
 #include "IThread.hpp"
+#include "TypeDefinition.hpp"
 
 namespace ssg {
 
@@ -9,7 +10,7 @@ class JThread : public IThread {
 
 public:
   template <typename Action>
-  JThread(Action a) : IThread(std::forward<Action>(a)){};
+  JThread(const ID id, Action && a) : IThread(id, std::forward<Action>(a)){};
   virtual ~JThread() { t.join(); };
 };
 

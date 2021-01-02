@@ -1,25 +1,28 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
+// #include "IResult.hpp"
+#include <any>
 #include <cstdint>
 #include "TypeDefinition.hpp"
-#include "IResult.hpp"
 
 namespace ssg {
 
 class Message {
 protected:
   ID id;
-  std::unique_ptr<IResult> data;
+  std::any data;
 
 public:
-  Message(const ID iden,std::unique_ptr<IResult> d);
+  Message(const ID iden, std::any d);
   virtual ~Message() = default;
 
   ID getId() const;
 
-  std::unique_ptr<IResult> getData();
-
+  template<typename R>
+  R getData() {
+    return std::any_cast<R>(data);
+  }
 };
 
 } // namespace ssg
