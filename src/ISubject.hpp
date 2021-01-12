@@ -25,7 +25,8 @@ public:
 
   void attach(IObserver *obs);
   void remove(IObserver *obs);
-  void notifyAll() const;
+  void removeAll();
+  void notifyAll();
 };
 
 } // namespace ssg

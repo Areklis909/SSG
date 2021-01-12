@@ -15,10 +15,14 @@ void ISubject::remove(IObserver *obs) {
       observers.end());
 }
 
-void ISubject::notifyAll() const {
+void ISubject::notifyAll() {
   for (auto obs : observers) {
     obs->update(result);
   }
+}
+
+void ISubject::removeAll() {
+  observers.clear();
 }
 
 } // namespace ssg

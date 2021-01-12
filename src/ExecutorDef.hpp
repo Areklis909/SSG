@@ -24,19 +24,17 @@ void Executor<ResultType>::update(std::shared_ptr<Message> m) {
 
 template <typename ResultType> ID Executor<ResultType>::waitForWorker() {
   std::unique_lock<std::mutex> lck(mtx);
-  while (availableWorkers.empty()) {
-    cv.wait(lck);
-  }
+  cv.wait(lck, [this] { return !availableWorkers.empty(); });
   const ID id = availableWorkers.front();
   availableWorkers.pop_front();
   return id;
 }
 
 template <typename ResultType>
-void Executor<ResultType>::execute(std::vector<ITask<ResultType>> &&v) {
+void Executor<ResultType>::execute(std::vector<ITask<ResultType>> &&tasks) {
   while (v.empty() == false) {
     const ID id = waitForWorker();
-    ITask<ResultType> copied(v.back());
+    ITask<ResultType> copied(tasks.back());
     std::unique_ptr<DThread> t =
         std::make_unique<DThread>(id, [copied]() mutable {
           return copied.run();
@@ -47,9 +45,7 @@ void Executor<ResultType>::execute(std::vector<ITask<ResultType>> &&v) {
   }
 
   std::unique_lock<std::mutex> lck(mtx);
-  while(availableWorkers.size() != noThreads) {
-    cv.wait(lck);
-  }
+  cv.wait(lck, [this] { return availableWorkers.size() == noThreads; });
 }
 
 template <typename ResultType> ResultType &Executor<ResultType>::getResult() {
